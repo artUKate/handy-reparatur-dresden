@@ -65,7 +65,7 @@ export const SERVICES_LIST: ServiceDefect[] = [
     duration: '24 – 48 Std.',
     priceFrom: 59,
     highlight: 'Hohe Datenrettungsquote',
-    image: '/src/assets/images/exploded_phone_water_damage_render_1788884193147.jpg',
+    image: '[https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=800&q=80](https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=800&q=80)',
   },
   {
     id: 'ladebuchse',
