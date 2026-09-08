@@ -1,0 +1,6 @@
+{
+  "name": "Handy Reparatur Sachsen — Professionelle Sofort-Reparatur Dresden",
+  "description": "Smartphone & Laptop Reparatur in Dresden Friedrichstadt. 35 Min. Express-Service, 100% Datensicherheit.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
