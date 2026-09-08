@@ -1,7 +1,104 @@
 import { useState } from 'react';
 import { Star, ShieldCheck, CheckCircle2, MessageSquare, ExternalLink, ThumbsUp } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, useMotionValue, useSpring } from 'motion/react';
 import { GOOGLE_REVIEWS, COMPANY_INFO } from '../data';
+
+const REVIEW_COLORS: Record<string, string> = {
+  iPhone: 'rgba(59, 130, 246, 0.4)',      // blue
+  Samsung: 'rgba(16, 185, 129, 0.4)',     // emerald
+  Laptop: 'rgba(139, 92, 246, 0.4)',      // violet
+  Wasserschaden: 'rgba(245, 158, 11, 0.4)', // amber
+};
+
+function ReviewCard({ rev }: { rev: typeof GOOGLE_REVIEWS[0] }) {
+  const blobColor = REVIEW_COLORS[rev.tag] || 'rgba(59, 130, 246, 0.3)';
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { damping: 25, stiffness: 150 };
+  const x = useSpring(mouseX, springConfig);
+  const y = useSpring(mouseY, springConfig);
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    mouseX.set(e.clientX - rect.left - rect.width / 2);
+    mouseY.set(e.clientY - rect.top - rect.height / 2);
+  }
+
+  function handleMouseLeave() {
+    mouseX.set(0);
+    mouseY.set(0);
+  }
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      whileHover={{ 
+        y: -5,
+      }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className="relative flex-none w-[300px] sm:w-[380px] snap-center rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all shadow-xl group cursor-default overflow-hidden"
+    >
+      {/* Animated Gradient Blob */}
+      <motion.div
+        style={{
+          x,
+          y,
+          background: `radial-gradient(circle, ${blobColor} 0%, transparent 70%)`,
+        }}
+        className="absolute -inset-24 opacity-0 transition-opacity duration-500 group-hover:opacity-100 blur-[60px] pointer-events-none"
+      />
+
+      <div className="relative z-10">
+        <div>
+          {/* Header: Author & Google Icon */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center font-bold text-sm text-blue-400">
+                {rev.author.charAt(0)}
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-white flex items-center gap-1.5">
+                  <span>{rev.author}</span>
+                  {rev.verified && (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" title="Verifizierter Kunde" />
+                  )}
+                </div>
+                <div className="text-[11px] text-white/40">Dresden · {rev.date}</div>
+              </div>
+            </div>
+            <div className="w-5 h-5 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-[10px] font-bold text-white/60">
+              G
+            </div>
+          </div>
+
+          {/* Star rating */}
+          <div className="flex text-amber-400 mb-3">
+            {[...Array(rev.rating)].map((_, i) => (
+              <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+            ))}
+          </div>
+
+          {/* Review Text */}
+          <p className="text-sm text-white/70 leading-relaxed italic font-light">
+            &ldquo;{rev.text}&rdquo;
+          </p>
+        </div>
+
+        {/* Tag for device repaired */}
+        <div className="mt-5 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+          <span className="text-[11px] text-white/40">
+            Repariertes Gerät:
+          </span>
+          <span className="px-3 py-0.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-medium text-blue-400">
+            {rev.device}
+          </span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 export default function SocialProof() {
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'iPhone' | 'Samsung' | 'Laptop' | 'Wasserschaden'>('all');
@@ -127,63 +224,7 @@ export default function SocialProof() {
         {/* Reviews Cards Horizontal Row */}
         <div className="flex overflow-x-auto gap-6 pt-12 pb-8 scrollbar-hide snap-x">
           {filteredReviews.map((rev) => (
-            <motion.div
-              key={rev.id}
-              whileHover={{ 
-                scale: 1.05, 
-                y: -5,
-                backgroundColor: "rgba(59, 130, 246, 0.1)",
-                borderColor: "rgba(59, 130, 246, 0.4)",
-                boxShadow: "0 20px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -6px rgba(59, 130, 246, 0.1)"
-              }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="flex-none w-[300px] sm:w-[380px] snap-center rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 p-6 sm:p-7 flex flex-col justify-between hover:border-white/20 transition-all shadow-xl group cursor-default"
-            >
-              <div>
-                {/* Header: Author & Google Icon */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center font-bold text-sm text-blue-400">
-                      {rev.author.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold text-white flex items-center gap-1.5">
-                        <span>{rev.author}</span>
-                        {rev.verified && (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" title="Verifizierter Kunde" />
-                        )}
-                      </div>
-                      <div className="text-[11px] text-white/40">Dresden · {rev.date}</div>
-                    </div>
-                  </div>
-                  <div className="w-5 h-5 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-[10px] font-bold text-white/60">
-                    G
-                  </div>
-                </div>
-
-                {/* Star rating */}
-                <div className="flex text-amber-400 mb-3">
-                  {[...Array(rev.rating)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-
-                {/* Review Text */}
-                <p className="text-sm text-white/70 leading-relaxed italic font-light">
-                  &ldquo;{rev.text}&rdquo;
-                </p>
-              </div>
-
-              {/* Tag for device repaired */}
-              <div className="mt-5 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
-                <span className="text-[11px] text-white/40">
-                  Repariertes Gerät:
-                </span>
-                <span className="px-3 py-0.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-medium text-blue-400">
-                  {rev.device}
-                </span>
-              </div>
-            </motion.div>
+            <ReviewCard key={rev.id} rev={rev} />
           ))}
         </div>
 
